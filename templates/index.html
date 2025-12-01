@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OpenLP → PDF</title>
+</head>
+<body>
+  <h2>Upload OpenLP Files</h2>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for msg in messages %}
+        <p style="color:red;">{{ msg }}</p>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="/upload" enctype="multipart/form-data">
+    <div>
+      <label>Service file (.osz):</label>
+      <input type="file" name="service_file" required>
+    </div>
+
+    <div>
+      <label>Theme file (.otz):</label>
+      <input type="file" name="theme_file" required>
+    </div>
+
+    <br>
+
+    <button type="submit">Upload</button>
+  </form>
+</body>
+</html>
+
