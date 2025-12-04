@@ -1,0 +1,10 @@
+jobs:
+  housekeeper:
+    schedule: "*/1 * * * *"
+    command: "housekeeper"
+    description: "Deletes expired job folders and Redis entries"
+
+  daily_cleanup:
+    schedule: "0 2 * * *"
+    command: "housekeeper"
+    description: "Daily full cleanup safety sweep"

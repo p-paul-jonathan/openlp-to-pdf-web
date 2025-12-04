@@ -1,23 +1,27 @@
 from redis import Redis
+import os
 from rq import Queue
 
-redis_conn = Redis(host="localhost", port=6379)
+redis_conn = Redis(
+    host=os.getenv("REDIS_HOST", "redis"),
+    port=int(os.getenv("REDIS_PORT", 6379)),
+    decode_responses=True
+)
+
 queue = Queue("openlp-jobs", connection=redis_conn)
 
 
-def enqueue(job_class, job_id, data):
-    job_class().set_status(job_id, "queued", 0)
-    return queue.enqueue(job_class().run, job_id, data)
+def enqueue(job_class, job_id, payload):
+    job = job_class()
+    job.set_status(job_id, "queued", "Waiting")
+    return queue.enqueue(job.run, job_id, payload)
 
-def get_job_status(job_class, job_id):
-    try:
-        job = job_class().fetch(job_id, connection=redis_conn)
-        return {
-            "status": job.get_status(),
-            "result": job.result,
-            "failed": job.is_failed,
-            "started_at": job.started_at,
-            "ended_at": job.ended_at
-        }
-    except Exception:
-        return {"status": "not_found"}
+
+def get_job(job_id):
+    data = redis_conn.hgetall(job_id)
+    if not data:
+        return None
+    return data
+
+def delete_job(job_id):
+    redis_conn.delete(job_id)

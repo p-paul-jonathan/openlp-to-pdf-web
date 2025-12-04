@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7
+    container_name: openlp_redis
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    container_name: openlp_web
+    ports:
+      - "5050:5000"
+    env_file: .env
+    volumes:
+      - ./tmp:/app/tmp
+    depends_on:
+      - redis
+    command: ["gunicorn", "--timeout", "120", "-b", "0.0.0.0:5000", "app:create_app()"]
+
+  worker:
+    build: .
+    container_name: openlp_worker
+    env_file: .env
+    volumes:
+      - ./tmp:/app/tmp
+    depends_on:
+      - redis
+    command: ["rq", "worker", "openlp-jobs"]
+
+  scheduler:
+    build: .
+    container_name: openlp_scheduler
+    env_file: .env
+    volumes:
+      - ./tmp:/app/tmp
+    depends_on:
+      - redis
+    command: ["sh", "-c", "while true; do python scripts/scheduler.py --install; sleep 60; done"]

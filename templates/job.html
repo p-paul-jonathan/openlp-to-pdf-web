@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Job Status · OpenLP → PDF</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            nord0: '#2E3440',
+            nord1: '#3B4252',
+            nord2: '#434C5E',
+            nord3: '#4C566A',
+            nord4: '#D8DEE9',
+            nord5: '#E5E9F0',
+            nord6: '#ECEFF4',
+            nord7: '#8FBCBB',
+            nord8: '#88C0D0',
+            nord9: '#81A1C1',
+            nord10: '#5E81AC',
+            nord11: '#BF616A',
+            nord12: '#D08770',
+            nord13: '#EBCB8B',
+            nord14: '#A3BE8C',
+            nord15: '#B48EAD',
+          },
+        },
+      },
+    };
+  </script>
+
+  <script>
+    (function () {
+      const stored = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (stored === 'dark' || (!stored && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    async function poll() {
+      try {
+        const res = await fetch("/job/{{ job_id }}/status");
+        const data = await res.json();
+
+        const statusEl = document.getElementById("status");
+        const messageEl = document.getElementById("message");
+        const downloadEl = document.getElementById("download");
+
+        const status = data.status || "unknown";
+        statusEl.textContent = status;
+
+        messageEl.textContent = data.message || "";
+
+        // Badge colors depending on status
+        statusEl.className =
+          "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold " +
+          (status === "completed"
+            ? "bg-nord14/20 text-nord14"
+            : status === "error"
+              ? "bg-nord11/20 text-nord11"
+              : status === "queued"
+                ? "bg-nord13/20 text-nord13"
+                : status === "in_progress"
+                  ? "bg-nord8/20 text-nord8"
+                  : "bg-nord3/30 text-nord4");
+
+        if (status === "completed") {
+          downloadEl.style.display = "flex";
+        }
+
+        if (status !== "completed" && status !== "error" && status !== "not_found") {
+          setTimeout(poll, 2000);
+        }
+      } catch (e) {
+        console.error("Status polling failed", e);
+        setTimeout(poll, 5000);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", poll);
+  </script>
+</head>
+
+<body class="min-h-screen bg-nord6 text-nord1 dark:bg-nord0 dark:text-nord6 transition-colors duration-200">
+  <div class="min-h-screen flex flex-col">
+    <!-- Top bar -->
+    <header class="w-full border-b border-nord4/40 dark:border-nord2/80 bg-nord6/70 dark:bg-nord0/80 backdrop-blur">
+      <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <a href="/" class="flex items-center gap-2 group">
+            <span
+              class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-nord8/20 text-nord10 font-semibold group-hover:bg-nord8/30 transition-colors">
+              ♪
+            </span>
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold tracking-wide uppercase text-nord10 group-hover:text-nord8">
+                OpenLP → PDF
+              </span>
+              <span class="text-xs text-nord3 dark:text-nord4/80">Job status</span>
+            </div>
+          </a>
+        </div>
+
+        <button type="button" onclick="toggleTheme()"
+          class="inline-flex items-center gap-1 rounded-full border border-nord4/60 dark:border-nord2 px-3 py-1 text-xs font-medium text-nord3 dark:text-nord4 hover:bg-nord5/70 dark:hover:bg-nord1 transition-colors">
+          <span class="hidden sm:inline">Toggle theme</span>
+          <span class="sm:hidden">☯</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-1 flex items-center justify-center px-4 py-10">
+      <div class="w-full max-w-xl">
+        <div
+          class="rounded-2xl bg-nord6/80 dark:bg-nord1/80 shadow-lg shadow-nord0/10 dark:shadow-black/40 border border-nord4/60 dark:border-nord2 px-6 py-6 sm:px-8 sm:py-7">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-xl sm:text-2xl font-semibold mb-1">Job Status</h2>
+              <p class="text-xs text-nord3 dark:text-nord4/80 break-all">
+                Job ID:
+                <span class="font-mono text-nord10">{{ job_id }}</span>
+              </p>
+            </div>
+            <span id="status"
+              class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-nord3/30 text-nord4">
+              Loading…
+            </span>
+          </div>
+
+          <div class="mb-4">
+            <p id="message" class="text-sm text-nord3 dark:text-nord4/80 min-h-[1.25rem]"></p>
+          </div>
+
+          <div id="download"
+            class="mt-4 hidden flex-col gap-3 rounded-xl border border-nord8/50 bg-nord8/10 px-4 py-4 text-sm">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex flex-col">
+                <span class="font-semibold text-nord8">Your PDF is ready</span>
+                <span class="text-xs text-nord3 dark:text-nord4/80">
+                  Click below to download the generated slides PDF.
+                </span>
+              </div>
+              <a href="/job/{{ job_id }}/download"
+                class="inline-flex items-center gap-2 rounded-full bg-nord8 hover:bg-nord10 text-nord0 px-4 py-2 text-xs font-semibold shadow-sm shadow-nord0/20 transition-colors">
+                Download PDF
+              </a>
+            </div>
+
+            <!-- ✅ Back to home button -->
+            <div class="flex justify-end">
+              <a href="/"
+                class="inline-flex items-center gap-2 rounded-full border border-nord8/60 text-nord8 px-4 py-2 text-xs font-semibold hover:bg-nord8/20 transition-colors">
+                Back to Home
+              </a>
+            </div>
+          </div>
+
+          <div class="mt-6 text-xs text-nord3/80 dark:text-nord4/70">
+            This page will auto-refresh the status every few seconds while your job is queued or processing.
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="py-4 text-center text-xs text-nord3 dark:text-nord4/70">
+      OpenLP → PDF · background jobs handled by Redis + RQ
+    </footer>
+  </div>
+</body>
+
+</html>
