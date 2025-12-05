@@ -1,175 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>OpenLP → PDF</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+{% extends "base.html" %}
+{% block title %}OpenLP → PDF{% endblock %}
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            nord0: '#2E3440',
-            nord1: '#3B4252',
-            nord2: '#434C5E',
-            nord3: '#4C566A',
-            nord4: '#D8DEE9',
-            nord5: '#E5E9F0',
-            nord6: '#ECEFF4',
-            nord7: '#8FBCBB',
-            nord8: '#88C0D0',
-            nord9: '#81A1C1',
-            nord10: '#5E81AC',
-            nord11: '#BF616A',
-            nord12: '#D08770',
-            nord13: '#EBCB8B',
-            nord14: '#A3BE8C',
-            nord15: '#B48EAD',
-          },
-        },
-      },
-    };
-  </script>
+{% block header_subtitle %}
+Convert OpenLP services into printable PDFs
+{% endblock %}
 
-  <script>
-    (function () {
-      const stored = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (stored === 'dark' || (!stored && prefersDark)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    })();
+{% block content %}
+<div class="w-full max-w-xl">
+  <div class="rounded-2xl bg-nord6 dark:bg-nord1
+              border border-nord4 dark:border-nord2
+              shadow-lg p-8">
 
-    function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    }
-  </script>
-</head>
+    <h2 class="text-2xl font-semibold mb-2 text-nord1 dark:text-nord6">
+      Upload OpenLP Files
+    </h2>
 
-<body class="min-h-screen bg-nord5 text-nord1 dark:bg-nord0 dark:text-nord6 transition-colors duration-200">
-  <div class="min-h-screen flex flex-col">
+    <p class="text-sm text-nord3 dark:text-nord4/80 mb-6">
+      Upload <span class="font-mono text-nord10 dark:text-nord8">.osz</span>
+      and <span class="font-mono text-nord10 dark:text-nord8">.otz</span> files.
+    </p>
 
-    <!-- Header -->
-    <header class="w-full border-b border-nord4 dark:border-nord2 bg-nord5 dark:bg-nord0">
-      <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-nord8/20 text-nord10 font-semibold">
-            ♪
-          </span>
-          <div class="flex flex-col">
-            <span class="text-sm font-semibold tracking-wide uppercase text-nord10">OpenLP → PDF</span>
-            <span class="text-xs text-nord3 dark:text-nord4/80">
-              Convert OpenLP services into printable PDFs
-            </span>
-          </div>
-        </div>
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="mb-4 space-y-1">
+      {% for msg in messages %}
+      <div class="text-sm rounded-md border border-nord11 dark:border-nord11/70
+                  bg-nord11/10 dark:bg-nord11/20
+                  text-nord11 px-3 py-2">
+        {{ msg }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
 
-        <button
-          type="button"
-          onclick="toggleTheme()"
-          class="inline-flex items-center gap-1 rounded-full border border-nord4 dark:border-nord2 px-3 py-1 text-xs font-medium text-nord3 dark:text-nord4 hover:bg-nord6 dark:hover:bg-nord1 transition-colors"
-        >
-          <span class="hidden sm:inline">Toggle theme</span>
+    <form method="POST" action="/upload" enctype="multipart/form-data" class="space-y-5">
+
+      <div class="space-y-1.5">
+        <label class="block text-sm font-medium text-nord3 dark:text-nord4">
+          Service file (.osz)
+        </label>
+
+        <input type="file" name="service_file" accept=".osz" required class="block w-full text-sm text-nord3 dark:text-nord4
+                 file:mr-4 file:rounded-md file:border-0
+                 file:bg-nord8/20 dark:file:bg-nord8/30
+                 file:px-3 file:py-1.5 file:text-sm file:font-medium
+                 file:text-nord10 dark:file:text-nord8
+                 hover:file:bg-nord8/30 dark:hover:file:bg-nord8/40
+                 bg-nord6 dark:bg-nord2
+                 border border-nord4 dark:border-nord2
+                 rounded-lg focus:outline-none focus:ring-2 focus:ring-nord8/70" />
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="block text-sm font-medium text-nord3 dark:text-nord4">
+          Theme file (.otz)
+        </label>
+
+        <input type="file" name="theme_file" accept=".otz" required class="block w-full text-sm text-nord3 dark:text-nord4
+                 file:mr-4 file:rounded-md file:border-0
+                 file:bg-nord8/20 dark:file:bg-nord8/30
+                 file:px-3 file:py-1.5 file:text-sm file:font-medium
+                 file:text-nord10 dark:file:text-nord8
+                 hover:file:bg-nord8/30 dark:hover:file:bg-nord8/40
+                 bg-nord6 dark:bg-nord2
+                 border border-nord4 dark:border-nord2
+                 rounded-lg focus:outline-none focus:ring-2 focus:ring-nord8/70" />
+      </div>
+
+      <div class="pt-2 flex items-center justify-between gap-3">
+        <p class="text-xs text-nord3/80 dark:text-nord4/70">
+          We’ll create a job and you can watch the status on the next screen.
+        </p>
+
+        <button type="submit" class="inline-flex items-center gap-2 rounded-full
+                 bg-nord8 hover:bg-nord10 text-nord0
+                 dark:bg-nord8 dark:hover:bg-nord9 dark:text-nord0
+                 px-4 py-2 text-sm font-semibold
+                 shadow-sm shadow-nord0/20 transition-colors">
+          Upload &amp; convert
         </button>
       </div>
-    </header>
 
-    <!-- Main -->
-    <main class="flex-1 flex items-center justify-center px-4 py-10">
-      <div class="w-full max-w-xl">
-        <div
-          class="rounded-2xl bg-nord6 dark:bg-nord1 shadow-lg shadow-nord3/10 dark:shadow-black/40
-                 border border-nord4 dark:border-nord2 px-6 py-6 sm:px-8 sm:py-7">
+    </form>
 
-          <h2 class="text-xl sm:text-2xl font-semibold mb-1">Upload OpenLP Files</h2>
-          <p class="text-sm text-nord3 dark:text-nord4/80 mb-6">
-            Select your <span class="font-mono text-nord10">.osz</span> service file and
-            <span class="font-mono text-nord10">.otz</span> theme file to generate a themed PDF.
-          </p>
-
-          <!-- Flash messages -->
-          {% with messages = get_flashed_messages() %}
-            {% if messages %}
-              <div class="mb-4 space-y-1">
-                {% for msg in messages %}
-                  <div class="text-sm rounded-md border border-nord11 bg-nord11/10 text-nord11 px-3 py-2">
-                    {{ msg }}
-                  </div>
-                {% endfor %}
-              </div>
-            {% endif %}
-          {% endwith %}
-
-          <form method="POST" action="/upload" enctype="multipart/form-data" class="space-y-5">
-            <div class="space-y-1.5">
-              <label class="block text-sm font-medium text-nord3 dark:text-nord4">
-                Service file (.osz)
-              </label>
-              <input
-                type="file"
-                name="service_file"
-                accept=".osz"
-                required
-                class="block w-full text-sm text-nord3 dark:text-nord4
-                       file:mr-4 file:rounded-md file:border-0 file:bg-nord8/20
-                       file:px-3 file:py-1.5 file:text-sm file:font-medium
-                       file:text-nord10 hover:file:bg-nord8/30
-                       bg-nord6 dark:bg-nord2
-                       border border-nord4 dark:border-nord2
-                       rounded-lg focus:outline-none focus:ring-2 focus:ring-nord8/70"
-              />
-            </div>
-
-            <div class="space-y-1.5">
-              <label class="block text-sm font-medium text-nord3 dark:text-nord4">
-                Theme file (.otz)
-              </label>
-              <input
-                type="file"
-                name="theme_file"
-                accept=".otz"
-                required
-                class="block w-full text-sm text-nord3 dark:text-nord4
-                       file:mr-4 file:rounded-md file:border-0 file:bg-nord8/20
-                       file:px-3 file:py-1.5 file:text-sm file:font-medium
-                       file:text-nord10 hover:file:bg-nord8/30
-                       bg-nord6 dark:bg-nord2
-                       border border-nord4 dark:border-nord2
-                       rounded-lg focus:outline-none focus:ring-2 focus:ring-nord8/70"
-              />
-            </div>
-
-            <div class="pt-2 flex items-center justify-between gap-3">
-              <p class="text-xs text-nord3/80 dark:text-nord4/70">
-                We’ll create a job and you can watch the status on the next screen.
-              </p>
-              <button
-                type="submit"
-                class="inline-flex items-center gap-2 rounded-full
-                       bg-nord8 hover:bg-nord10 text-nord0
-                       px-4 py-2 text-sm font-semibold
-                       shadow-sm shadow-nord0/20 transition-colors"
-              >
-                Upload &amp; convert
-              </button>
-            </div>
-          </form>
-
-        </div>
-      </div>
-    </main>
-
-    <footer class="py-4 text-center text-xs text-nord3 dark:text-nord4/70">
-      Built for OpenLP workflows · PDFs themed by your .otz
-    </footer>
   </div>
-</body>
-</html>
+</div>
+{% endblock %}

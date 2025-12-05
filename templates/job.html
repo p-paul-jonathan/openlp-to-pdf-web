@@ -1,188 +1,211 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Job Status · OpenLP → PDF</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+{% block title %}Job Status · OpenLP → PDF{% endblock %}
+{% block header_subtitle %}Job status · Processing your PDF{% endblock %}
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            nord0: '#2E3440',
-            nord1: '#3B4252',
-            nord2: '#434C5E',
-            nord3: '#4C566A',
-            nord4: '#D8DEE9',
-            nord5: '#E5E9F0',
-            nord6: '#ECEFF4',
-            nord7: '#8FBCBB',
-            nord8: '#88C0D0',
-            nord9: '#81A1C1',
-            nord10: '#5E81AC',
-            nord11: '#BF616A',
-            nord12: '#D08770',
-            nord13: '#EBCB8B',
-            nord14: '#A3BE8C',
-            nord15: '#B48EAD',
-          },
-        },
-      },
-    };
-  </script>
+{% block head_scripts %}
+<script>
+  async function poll() {
+    try {
+      const res = await fetch("/job/{{ job_id }}/status");
+      const data = await res.json();
 
-  <script>
-    (function () {
-      const stored = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (stored === 'dark' || (!stored && prefersDark)) {
-        document.documentElement.classList.add('dark');
+      const statusEl = document.getElementById("status");
+      const messageEl = document.getElementById("message");
+      const spinnerEl = document.getElementById("spinner");
+      const spinnerText = document.getElementById("spinnerText");
+      const successBox = document.getElementById("successBox");
+      const errorBox = document.getElementById("errorBox");
+      const notFoundBox = document.getElementById("notFoundBox");
+
+      const status = data.status || "unknown";
+      statusEl.textContent = status;
+      messageEl.textContent = data.message || "";
+
+      // Badge styling
+      const statusClasses = {
+        completed: "bg-nord14/20 text-nord14",
+        error: "bg-nord11/20 text-nord11",
+        queued: "bg-nord13/20 text-nord13",
+        in_progress: "bg-nord8/20 text-nord8",
+        not_found: `bg-nord4/30 text-nord3
+                    border border-nord3/40
+                    dark:bg-nord1/40 dark:text-nord5
+                    dark:border-nord6/20`,
+        default: "bg-nord3/30 text-nord4",
+      };
+
+      statusEl.className =
+        "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold " +
+        (statusClasses[status] || statusClasses.default)
+
+      // Spinner logic
+      if (status === "queued") {
+        spinnerEl.classList.remove("hidden");
+        spinnerText.textContent = "Queued…";
+      } else if (status === "in_progress") {
+        spinnerEl.classList.remove("hidden");
+        spinnerText.textContent = "Processing…";
       } else {
-        document.documentElement.classList.remove('dark');
+        spinnerEl.classList.add("hidden");
       }
-    })();
 
-    function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    }
-
-    async function poll() {
-      try {
-        const res = await fetch("/job/{{ job_id }}/status");
-        const data = await res.json();
-
-        const statusEl = document.getElementById("status");
-        const messageEl = document.getElementById("message");
-        const downloadEl = document.getElementById("download");
-
-        const status = data.status || "unknown";
-        statusEl.textContent = status;
-
-        messageEl.textContent = data.message || "";
-
-        // Badge colors depending on status
-        statusEl.className =
-          "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold " +
-          (status === "completed"
-            ? "bg-nord14/20 text-nord14"
-            : status === "error"
-              ? "bg-nord11/20 text-nord11"
-              : status === "queued"
-                ? "bg-nord13/20 text-nord13"
-                : status === "in_progress"
-                  ? "bg-nord8/20 text-nord8"
-                  : "bg-nord3/30 text-nord4");
-
-        if (status === "completed") {
-          downloadEl.style.display = "flex";
-        }
-
-        if (status !== "completed" && status !== "error" && status !== "not_found") {
-          setTimeout(poll, 2000);
-        }
-      } catch (e) {
-        console.error("Status polling failed", e);
-        setTimeout(poll, 5000);
+      if (status === "completed") {
+        successBox.classList.remove("hidden");
       }
+
+      if (status === "error") {
+        errorBox.classList.remove("hidden");
+      }
+
+      if (status === "not_found") {
+        notFoundBox.classList.remove("hidden");
+      }
+
+      if (!["completed", "error", "not_found"].includes(status)) {
+        setTimeout(poll, 2000);
+      }
+    } catch (e) {
+      console.error("Polling failed", e);
+      setTimeout(poll, 5000);
     }
+  }
 
-    document.addEventListener("DOMContentLoaded", poll);
-  </script>
-</head>
+  document.addEventListener("DOMContentLoaded", poll);
+</script>
+{% endblock %}
 
-<body class="min-h-screen bg-nord6 text-nord1 dark:bg-nord0 dark:text-nord6 transition-colors duration-200">
-  <div class="min-h-screen flex flex-col">
-    <!-- Top bar -->
-    <header class="w-full border-b border-nord4/40 dark:border-nord2/80 bg-nord6/70 dark:bg-nord0/80 backdrop-blur">
-      <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <a href="/" class="flex items-center gap-2 group">
-            <span
-              class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-nord8/20 text-nord10 font-semibold group-hover:bg-nord8/30 transition-colors">
-              ♪
-            </span>
-            <div class="flex flex-col">
-              <span class="text-sm font-semibold tracking-wide uppercase text-nord10 group-hover:text-nord8">
-                OpenLP → PDF
-              </span>
-              <span class="text-xs text-nord3 dark:text-nord4/80">Job status</span>
-            </div>
+{% block content %}
+<div class="w-full max-w-xl mx-auto">
+
+  <div class="rounded-2xl bg-nord6/80 dark:bg-nord1/80 shadow-lg border border-nord4 dark:border-nord2 px-8 py-7">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-semibold mb-1">Job Status</h2>
+        <p class="text-xs text-nord3 dark:text-nord4/80 break-all">
+          Job ID:
+          <span class="font-mono text-nord10">{{ job_id }}</span>
+        </p>
+      </div>
+
+      <span id="status"
+        class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-nord3/30 text-nord4">
+        Loading…
+      </span>
+    </div>
+
+    <!-- Message -->
+    <p id="message" class="text-sm text-nord3 dark:text-nord4/80 min-h-[1.25rem] mb-4"></p>
+
+    <!-- Spinner -->
+    <div id="spinner" class="hidden flex items-center space-x-2 text-nord8 text-sm mb-4">
+      <div class="h-3 w-3 rounded-full border-2 border-nord8 border-t-transparent animate-spin inline-block"></div>
+      <span id="spinnerText" class="inline-block leading-none">Processing…</span>
+    </div>
+
+    <!-- Success Box -->
+    <div id="successBox" class="hidden rounded-xl border border-nord14/50 bg-nord14/10 px-4 py-4 text-sm">
+
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 w-full">
+
+        <div class="flex-1">
+          <span class="font-semibold text-nord14 text-base block mb-1">
+            Thank you for using our service!
+          </span>
+
+          <p class="text-xs text-nord3 dark:text-nord4/80">
+            Your PDF has been generated successfully.<br>
+            You can download it now.<br><br>
+            Please note that the file will be deleted permanently in about 10 minutes.
+          </p>
+        </div>
+
+        <div class="flex flex-col items-end gap-2 shrink-0">
+
+          <a href="/job/{{ job_id }}/download" class="inline-flex items-center gap-2 rounded-full bg-nord14 hover:bg-nord10
+                text-nord0 px-4 py-2 text-xs font-semibold shadow transition w-fit">
+            Download PDF
           </a>
-        </div>
 
-        <button type="button" onclick="toggleTheme()"
-          class="inline-flex items-center gap-1 rounded-full border border-nord4/60 dark:border-nord2 px-3 py-1 text-xs font-medium text-nord3 dark:text-nord4 hover:bg-nord5/70 dark:hover:bg-nord1 transition-colors">
-          <span class="hidden sm:inline">Toggle theme</span>
-          <span class="sm:hidden">☯</span>
-        </button>
-      </div>
-    </header>
+          <a href="/" class="inline-flex rounded-full border border-nord14/60 text-nord14 px-4 py-2
+                text-xs font-semibold hover:bg-nord14/20 transition w-fit">
+            Back to Home
+          </a>
 
-    <!-- Main -->
-    <main class="flex-1 flex items-center justify-center px-4 py-10">
-      <div class="w-full max-w-xl">
-        <div
-          class="rounded-2xl bg-nord6/80 dark:bg-nord1/80 shadow-lg shadow-nord0/10 dark:shadow-black/40 border border-nord4/60 dark:border-nord2 px-6 py-6 sm:px-8 sm:py-7">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h2 class="text-xl sm:text-2xl font-semibold mb-1">Job Status</h2>
-              <p class="text-xs text-nord3 dark:text-nord4/80 break-all">
-                Job ID:
-                <span class="font-mono text-nord10">{{ job_id }}</span>
-              </p>
-            </div>
-            <span id="status"
-              class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-nord3/30 text-nord4">
-              Loading…
-            </span>
-          </div>
-
-          <div class="mb-4">
-            <p id="message" class="text-sm text-nord3 dark:text-nord4/80 min-h-[1.25rem]"></p>
-          </div>
-
-          <div id="download"
-            class="mt-4 hidden flex-col gap-3 rounded-xl border border-nord8/50 bg-nord8/10 px-4 py-4 text-sm">
-            <div class="flex items-center justify-between gap-3">
-              <div class="flex flex-col">
-                <span class="font-semibold text-nord8">Your PDF is ready</span>
-                <span class="text-xs text-nord3 dark:text-nord4/80">
-                  Click below to download the generated slides PDF.
-                </span>
-              </div>
-              <a href="/job/{{ job_id }}/download"
-                class="inline-flex items-center gap-2 rounded-full bg-nord8 hover:bg-nord10 text-nord0 px-4 py-2 text-xs font-semibold shadow-sm shadow-nord0/20 transition-colors">
-                Download PDF
-              </a>
-            </div>
-
-            <!-- ✅ Back to home button -->
-            <div class="flex justify-end">
-              <a href="/"
-                class="inline-flex items-center gap-2 rounded-full border border-nord8/60 text-nord8 px-4 py-2 text-xs font-semibold hover:bg-nord8/20 transition-colors">
-                Back to Home
-              </a>
-            </div>
-          </div>
-
-          <div class="mt-6 text-xs text-nord3/80 dark:text-nord4/70">
-            This page will auto-refresh the status every few seconds while your job is queued or processing.
-          </div>
         </div>
       </div>
-    </main>
 
-    <footer class="py-4 text-center text-xs text-nord3 dark:text-nord4/70">
-      OpenLP → PDF · background jobs handled by Redis + RQ
-    </footer>
+    </div>
+
+    <!-- Error Box -->
+    <div id="errorBox" class="hidden rounded-xl border border-nord11/50 bg-nord11/10 px-4 py-4 text-sm mt-4">
+
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 w-full">
+
+        <div class="flex-1">
+          <span class="font-semibold text-nord11 text-base block mb-1">
+            Uh oh! An error occurred.
+          </span>
+
+          <p class="text-xs text-nord11/90">
+            Something went wrong while processing your request.<br>
+            Please try again after some time.<br><br>
+            If the issue continues, raise an issue on GitHub.
+          </p>
+        </div>
+
+        <div class="flex flex-col items-end gap-2 shrink-0">
+
+          <a href="https://github.com/p-paul-jonathan/openlp-to-pdf-web/issues" target="_blank" class="inline-flex items-center gap-2 rounded-full bg-nord11 hover:bg-nord12
+                text-nord0 px-4 py-2 text-xs font-semibold shadow transition w-fit">
+            Report Issue
+          </a>
+
+          <a href="/" class="inline-flex rounded-full border border-nord11/60 text-nord11 px-4 py-2
+                text-xs font-semibold hover:bg-nord11/20 transition w-fit">
+            Back to Home
+          </a>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Not Found Box -->
+    <div id="notFoundBox"
+      class="hidden rounded-xl border border-nord3/40 dark:border-nord6/20 bg-nord4/10 dark:bg-nord1/40 px-4 py-4 text-sm mt-4">
+
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 w-full">
+
+        <div class="flex-1">
+          <span class="font-semibold text-nord3 dark:text-nord5 text-base block mb-1">
+            Job not found.
+          </span>
+
+          <p class="text-xs text-nord3/80 dark:text-nord5/80">
+            This job ID does not exist or may have expired.<br>
+            Please return to the home page and try again.
+          </p>
+        </div>
+
+        <div class="flex flex-col items-end gap-2 shrink-0">
+
+          <a href="/"
+            class="inline-flex rounded-full border border-nord3/40 dark:border-nord6/20 text-nord3 dark:text-nord5 px-4 py-2 text-xs font-semibold hover:bg-nord4/20 dark:hover:bg-nord2/30 transition w-fit">
+            Back to Home
+          </a>
+
+        </div>
+
+      </div>
+    </div>
+
+    <p class="mt-6 text-xs text-nord3 dark:text-nord4/70">
+      This page will auto-refresh your job status every few seconds while your job is queued or processing
+    </p>
+
   </div>
-</body>
-
-</html>
+</div>
+{% endblock %}

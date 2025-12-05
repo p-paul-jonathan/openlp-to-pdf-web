@@ -1,57 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}Error · OpenLP{% endblock %}
+{% block header_subtitle %}Something went wrong{% endblock %}
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Error · OpenLP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+{% block content %}
+<div class="max-w-md w-full
+            bg-nord6/90 dark:bg-nord1/90
+            border border-nord4 dark:border-nord2
+            rounded-2xl shadow-lg p-6">
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            nord0: '#2E3440', nord1: '#3B4252', nord2: '#434C5E', nord3: '#4C566A',
-            nord4: '#D8DEE9', nord5: '#E5E9F0', nord6: '#ECEFF4', nord7: '#8FBCBB',
-            nord8: '#88C0D0', nord9: '#81A1C1', nord10: '#5E81AC', nord11: '#BF616A',
-            nord12: '#D08770', nord13: '#EBCB8B', nord14: '#A3BE8C', nord15: '#B48EAD'
-          }
-        }
-      }
-    };
-  </script>
+  <div class="text-nord11 dark:text-nord11 font-bold text-xl mb-3">Unexpected Error</div>
 
-  <script>
-    (function () {
-      const stored = localStorage.getItem('theme');
-      const prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (stored === 'dark' || (!stored && prefers)) document.documentElement.classList.add('dark');
-    })();
-  </script>
-</head>
-
-<body class="min-h-screen bg-nord6 dark:bg-nord0 flex items-center justify-center px-4">
-
-  <div
-    class="max-w-md w-full bg-nord6/90 dark:bg-nord1/90 border border-nord4 dark:border-nord2 rounded-2xl shadow-lg p-6">
-
-    <div class="text-nord11 font-bold text-xl mb-3">
-      Unexpected Error
-    </div>
-
-    <div class="rounded bg-nord5 dark:bg-nord2 text-nord11 px-3 py-2 text-xs font-mono mb-4">
-      {{ error }}
-    </div>
-
-    <a href="/"
-      class="inline-block rounded-full bg-nord8 hover:bg-nord10 text-nord0 px-4 py-2 text-sm font-semibold transition">
-      Go Home
-    </a>
-
+  <div class="rounded
+              bg-nord5 dark:bg-nord2
+              text-nord11 dark:text-nord11
+              px-3 py-2 text-xs font-mono mb-4">
+    {{ error }}
   </div>
 
-</body>
+  <a href="/" class="inline-block rounded-full
+            bg-nord8 hover:bg-nord10
+            text-nord0
+            dark:bg-nord8 dark:hover:bg-nord9 dark:text-nord0
+            px-4 py-2 text-sm font-semibold transition">
+    Go Home
+  </a>
 
-</html>
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}OpenLP → PDF{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            nord0: '#2E3440', nord1: '#3B4252', nord2: '#434C5E', nord3: '#4C566A',
+            nord4: '#D8DEE9', nord5: '#E5E9F0', nord6: '#ECEFF4', nord7: '#8FBCBB',
+            nord8: '#88C0D0', nord9: '#81A1C1', nord10: '#5E81AC', nord11: '#BF616A',
+            nord12: '#D08770', nord13: '#EBCB8B', nord14: '#A3BE8C', nord15: '#B48EAD'
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Dark mode init -->
+  <script>
+    (function () {
+      const stored = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (stored === 'dark' || (!stored && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+  </script>
+
+  {% block head_scripts %}{% endblock %}
+</head>
+
+<body class="min-h-screen bg-nord5 text-nord1 dark:bg-nord0 dark:text-nord6 transition-colors duration-200">
+  <div class="min-h-screen flex flex-col">
+
+    <!-- Shared header -->
+    <header class="w-full border-b border-nord4 dark:border-nord2 bg-nord5 dark:bg-nord0">
+      <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+
+        <a href="/" class="flex items-center gap-2 group">
+          <span
+            class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-nord8/20 text-nord10 dark:text-nord8 font-semibold group-hover:bg-nord8/30">
+            ♪
+          </span>
+
+          <div class="flex flex-col">
+            <span
+              class="text-sm font-semibold tracking-wide uppercase text-nord10 dark:text-nord8 group-hover:text-nord8">
+              OpenLP → PDF
+            </span>
+
+            <span class="text-xs text-nord3 dark:text-nord4/80">
+              {% block header_subtitle %}Convert OpenLP files to PDF{% endblock %}
+            </span>
+          </div>
+        </a>
+
+        <button onclick="toggleTheme()" class="inline-flex items-center gap-1 rounded-full border border-nord4 dark:border-nord2 px-3 py-1 text-xs
+                 font-medium text-nord3 dark:text-nord4 hover:bg-nord6 dark:hover:bg-nord1/60 transition-colors">
+          Toggle theme
+        </button>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-1 px-4 py-10 flex items-center justify-center">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-nord3 dark:text-nord4/70">
+
+      <div class="flex items-center justify-center gap-3">
+
+        <!-- Left text -->
+        <span class="text-nord3 dark:text-nord4/80">
+          {% block footer_text %}
+          OpenLP → PDF
+          {% endblock %}
+        </span>
+
+        <!-- Separator dot -->
+        <span class="w-1 h-1 rounded-full bg-nord3 dark:bg-nord4/40"></span>
+
+        <!-- GitHub link -->
+        <a href="https://github.com/p-paul-jonathan/openlp-to-pdf-web/" class="inline-flex items-center gap-1 text-nord10 hover:text-nord8
+                 dark:text-nord9 dark:hover:text-nord7 transition" target="_blank">
+
+          <!-- GitHub Icon -->
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 0.297c-6.63 0-12 5.373-12 12 0 5.303
+         3.438 9.8 8.205 11.385 0.6 0.113 0.82-0.258
+         0.82-0.577 0-0.285-0.01-1.04-0.015-2.04-3.338
+         0.724-4.042-1.61-4.042-1.61-0.546-1.387-1.333-1.757-1.333-1.757
+         -1.089-0.745 0.084-0.729 0.084-0.729
+         1.205 0.084 1.84 1.237 1.84 1.237
+         1.07 1.835 2.807 1.305 3.492 0.998
+         0.108-0.776 0.417-1.305 0.76-1.605
+         -2.665-0.304-5.466-1.332-5.466-5.93
+         0-1.31 0.468-2.38 1.236-3.22
+         -0.135-0.303-0.54-1.523 0.105-3.176 0 0 1.005-0.322
+         3.3 1.23 0.96-0.267 1.98-0.399 3-0.405
+         1.02 0.006 2.04 0.138 3 0.405
+         2.28-1.552 3.285-1.23 3.285-1.23
+         0.645 1.653 0.24 2.873 0.12 3.176
+         0.765 0.84 1.23 1.91 1.23 3.22
+         0 4.61-2.805 5.625-5.475 5.92
+         0.42 0.36 0.81 1.096 0.81 2.22
+         0 1.606-0.015 2.896-0.015 3.286
+         0 0.315 0.21 0.69 0.825 0.57
+         C20.565 22.092 24 17.592 24 12.297
+         c0-6.627-5.373-12-12-12" />
+          </svg>
+
+          <span>GitHub</span>
+        </a>
+
+      </div>
+
+    </footer>
+
+  </div>
+</body>
+
+</html>

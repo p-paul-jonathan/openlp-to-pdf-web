@@ -1,57 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>404 · Not Found</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+{% extends "base.html" %}
+{% block title %}404 · Not Found{% endblock %}
+{% block header_subtitle %}Page not found{% endblock %}
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            nord0: '#2E3440', nord1: '#3B4252', nord2: '#434C5E', nord3: '#4C566A',
-            nord4: '#D8DEE9', nord5: '#E5E9F0', nord6: '#ECEFF4', nord7: '#8FBCBB',
-            nord8: '#88C0D0', nord9: '#81A1C1', nord10: '#5E81AC', nord11: '#BF616A',
-            nord12: '#D08770', nord13: '#EBCB8B', nord14: '#A3BE8C', nord15: '#B48EAD',
-          }
-        }
-      }
-    };
-  </script>
+{% block content %}
+<div class="max-w-md w-full text-center
+            bg-nord6/90 dark:bg-nord1/90
+            border border-nord4 dark:border-nord2
+            rounded-2xl shadow-lg p-6">
 
-  <script>
-    (function () {
-      const stored = localStorage.getItem('theme');
-      const prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (stored === 'dark' || (!stored && prefers)) document.documentElement.classList.add('dark');
-    })();
-  </script>
-</head>
+  <div class="text-6xl font-black text-nord11 dark:text-nord11 mb-4">404</div>
 
-<body class="min-h-screen bg-nord6 dark:bg-nord0 flex items-center justify-center px-4 transition-colors">
+  <p class="text-sm text-nord3 dark:text-nord5 mb-5">
+    The page you're looking for doesn't exist.
+  </p>
 
-  <div class="max-w-md w-full bg-nord6/90 dark:bg-nord1/90 border border-nord4 dark:border-nord2 rounded-2xl shadow-lg p-6 text-center">
+  <a href="/" class="inline-block rounded-full
+            bg-nord8 hover:bg-nord10
+            text-nord0
+            dark:bg-nord8 dark:hover:bg-nord9 dark:text-nord0
+            px-5 py-2 text-sm font-semibold transition">
+    Go Home
+  </a>
 
-    <div class="text-6xl font-black text-nord11 mb-4">404</div>
-
-    <h1 class="text-xl font-semibold text-nord1 dark:text-nord6 mb-2">
-      Page not found
-    </h1>
-
-    <p class="text-sm text-nord3 dark:text-nord4 mb-5">
-      The page you were looking for doesn’t exist or may have been moved.
-    </p>
-
-    <a href="/"
-       class="inline-block rounded-full bg-nord8 hover:bg-nord10 text-nord0 px-5 py-2 text-sm font-semibold transition">
-      Go Home
-    </a>
-
-  </div>
-
-</body>
-</html>
-
+</div>
+{% endblock %}
