@@ -6,16 +6,29 @@
 <div class="max-w-md w-full
             bg-nord6/90 dark:bg-nord1/90
             border border-nord4 dark:border-nord2
-            rounded-2xl shadow-lg p-6">
+            rounded-2xl shadow-lg p-6 text-center">
 
-  <div class="text-nord11 dark:text-nord11 font-bold text-xl mb-3">Unexpected Error</div>
+  <div class="text-nord11 dark:text-nord11 font-bold text-xl mb-3">
+    Unexpected Error
+  </div>
 
+  <p class="text-xs text-nord3 dark:text-nord5 mb-3">
+    Please retry after some time.<br>
+    If the issue persists, please raise an issue on
+    <a href="https://github.com/p-paul-jonathan/openlp-to-pdf-web/issues" target="_blank"
+      class="text-nord10 hover:text-nord8 dark:text-nord9 dark:hover:text-nord7 underline">
+      GitHub
+    </a>.
+  </p>
+
+  {% if error|length %}
   <div class="rounded
               bg-nord5 dark:bg-nord2
               text-nord11 dark:text-nord11
-              px-3 py-2 text-xs font-mono mb-4">
+              px-3 py-2 text-xs font-mono mb-4 text-left">
     {{ error }}
   </div>
+  {% endif %}
 
   <a href="/" class="inline-block rounded-full
             bg-nord8 hover:bg-nord10

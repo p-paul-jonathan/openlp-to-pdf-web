@@ -1,6 +1,10 @@
 from redis import Redis
 import os
 from rq import Queue
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 redis_conn = Redis(
     host=os.getenv("REDIS_HOST", "redis"),
