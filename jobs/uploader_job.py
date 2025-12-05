@@ -2,14 +2,8 @@ import os
 import traceback
 import time
 from jobs import redis_conn
-from services.openlp_service import extract_openlp_items, extract_service_items
+from services.openlp_service import extract_openlp_items, extract_service_items, TMP_DIR
 from services.pdf_service import convert_slides_to_pdf
-
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = os.path.dirname(BASE_DIR)
-TMP_DIR = os.path.join(BASE_DIR, "tmp")
-
 
 class UploaderJob:
     def set_status(self, job_id, status, progress=None):

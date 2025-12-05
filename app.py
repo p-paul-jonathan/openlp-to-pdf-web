@@ -6,7 +6,6 @@ from routes import web
 # Load .env variables at startup
 load_dotenv()
 
-
 def create_app():
     app = Flask(__name__)
 
