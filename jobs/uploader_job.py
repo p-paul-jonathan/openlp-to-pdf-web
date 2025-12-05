@@ -1,6 +1,7 @@
 import os
 import traceback
-from jobs.application_job import ApplicationJob
+import time
+from jobs import redis_conn
 from services.openlp_service import extract_openlp_items, extract_service_items
 from services.pdf_service import convert_slides_to_pdf
 
@@ -10,7 +11,25 @@ BASE_DIR = os.path.dirname(BASE_DIR)
 TMP_DIR = os.path.join(BASE_DIR, "tmp")
 
 
-class UploaderJob(ApplicationJob):
+class UploaderJob:
+    def set_status(self, job_id, status, progress=None):
+        if progress is not None:
+            redis_conn.hset(f"openlp:job:{job_id}", mapping={
+                "status": status,
+                "progress": progress,
+                "cleanup_at": int(time.time() + 600)
+            })
+        else:
+            redis_conn.hset(f"openlp:job:{job_id}", "status", status)
+
+    def get_status(self, job_id):
+        return redis_conn.hgetall(f"openlp:job:{job_id}")
+
+    def expire(self, job_id, seconds=3600):
+        redis_conn.expire(f"openlp:job:{job_id}", seconds)
+
+    def delete(self, job_id):
+        redis_conn.delete(f"openlp:job:{job_id}")
 
     def run(self, job_id, data):
         job_dir = os.path.join(TMP_DIR, job_id)

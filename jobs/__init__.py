@@ -18,10 +18,10 @@ def enqueue(job_class, job_id, payload):
 
 
 def get_job(job_id):
-    data = redis_conn.hgetall(job_id)
+    data = redis_conn.hgetall(f"openlp:job:{job_id}")
     if not data:
         return None
     return data
 
 def delete_job(job_id):
-    redis_conn.delete(job_id)
+    redis_conn.delete(f"openlp:job:{job_id}")

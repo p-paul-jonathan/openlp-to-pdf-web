@@ -1,8 +1,9 @@
 FROM python:3.11-slim
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     wget \
+    unzip \
     gnupg \
     ca-certificates \
     cron \
@@ -23,13 +24,11 @@ RUN apt-get update && apt-get install -y \
     libasound2 \
     fonts-liberation \
     fonts-noto-core \
-    fonts-noto-extra \
-    fonts-noto-unhinted \
-    fonts-noto-ui-core \
-    fonts-noto-color-emoji \
+    fonts-noto-mono \
     fonts-noto-cjk \
-    fonts-indic \
-    && rm -rf /var/lib/apt/lists/*
+    fonts-noto-color-emoji \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 WORKDIR /app
 

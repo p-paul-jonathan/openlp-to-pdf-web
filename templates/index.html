@@ -53,10 +53,12 @@
     }
   </script>
 </head>
-<body class="min-h-screen bg-nord6 text-nord1 dark:bg-nord0 dark:text-nord6 transition-colors duration-200">
+
+<body class="min-h-screen bg-nord5 text-nord1 dark:bg-nord0 dark:text-nord6 transition-colors duration-200">
   <div class="min-h-screen flex flex-col">
-    <!-- Top bar -->
-    <header class="w-full border-b border-nord4/40 dark:border-nord2/80 bg-nord6/70 dark:bg-nord0/80 backdrop-blur">
+
+    <!-- Header -->
+    <header class="w-full border-b border-nord4 dark:border-nord2 bg-nord5 dark:bg-nord0">
       <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-nord8/20 text-nord10 font-semibold">
@@ -64,17 +66,18 @@
           </span>
           <div class="flex flex-col">
             <span class="text-sm font-semibold tracking-wide uppercase text-nord10">OpenLP → PDF</span>
-            <span class="text-xs text-nord3 dark:text-nord4/80">Convert OpenLP services into printable PDFs</span>
+            <span class="text-xs text-nord3 dark:text-nord4/80">
+              Convert OpenLP services into printable PDFs
+            </span>
           </div>
         </div>
 
         <button
           type="button"
           onclick="toggleTheme()"
-          class="inline-flex items-center gap-1 rounded-full border border-nord4/60 dark:border-nord2 px-3 py-1 text-xs font-medium text-nord3 dark:text-nord4 hover:bg-nord5/70 dark:hover:bg-nord1 transition-colors"
+          class="inline-flex items-center gap-1 rounded-full border border-nord4 dark:border-nord2 px-3 py-1 text-xs font-medium text-nord3 dark:text-nord4 hover:bg-nord6 dark:hover:bg-nord1 transition-colors"
         >
           <span class="hidden sm:inline">Toggle theme</span>
-          <span class="sm:hidden">☯</span>
         </button>
       </div>
     </header>
@@ -82,7 +85,10 @@
     <!-- Main -->
     <main class="flex-1 flex items-center justify-center px-4 py-10">
       <div class="w-full max-w-xl">
-        <div class="rounded-2xl bg-nord6/80 dark:bg-nord1/80 shadow-lg shadow-nord0/10 dark:shadow-black/40 border border-nord4/60 dark:border-nord2 px-6 py-6 sm:px-8 sm:py-7">
+        <div
+          class="rounded-2xl bg-nord6 dark:bg-nord1 shadow-lg shadow-nord3/10 dark:shadow-black/40
+                 border border-nord4 dark:border-nord2 px-6 py-6 sm:px-8 sm:py-7">
+
           <h2 class="text-xl sm:text-2xl font-semibold mb-1">Upload OpenLP Files</h2>
           <p class="text-sm text-nord3 dark:text-nord4/80 mb-6">
             Select your <span class="font-mono text-nord10">.osz</span> service file and
@@ -94,7 +100,7 @@
             {% if messages %}
               <div class="mb-4 space-y-1">
                 {% for msg in messages %}
-                  <div class="text-sm rounded-md border border-nord11/60 bg-nord11/10 text-nord11 px-3 py-2">
+                  <div class="text-sm rounded-md border border-nord11 bg-nord11/10 text-nord11 px-3 py-2">
                     {{ msg }}
                   </div>
                 {% endfor %}
@@ -104,24 +110,40 @@
 
           <form method="POST" action="/upload" enctype="multipart/form-data" class="space-y-5">
             <div class="space-y-1.5">
-              <label class="block text-sm font-medium text-nord3 dark:text-nord4">Service file (.osz)</label>
+              <label class="block text-sm font-medium text-nord3 dark:text-nord4">
+                Service file (.osz)
+              </label>
               <input
                 type="file"
                 name="service_file"
                 accept=".osz"
                 required
-                class="block w-full text-sm text-nord3 dark:text-nord4 file:mr-4 file:rounded-md file:border-0 file:bg-nord8/20 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-nord10 hover:file:bg-nord8/30 bg-nord5/60 dark:bg-nord2/80 border border-nord4/60 dark:border-nord2 rounded-lg focus:outline-none focus:ring-2 focus:ring-nord8/70"
+                class="block w-full text-sm text-nord3 dark:text-nord4
+                       file:mr-4 file:rounded-md file:border-0 file:bg-nord8/20
+                       file:px-3 file:py-1.5 file:text-sm file:font-medium
+                       file:text-nord10 hover:file:bg-nord8/30
+                       bg-nord6 dark:bg-nord2
+                       border border-nord4 dark:border-nord2
+                       rounded-lg focus:outline-none focus:ring-2 focus:ring-nord8/70"
               />
             </div>
 
             <div class="space-y-1.5">
-              <label class="block text-sm font-medium text-nord3 dark:text-nord4">Theme file (.otz)</label>
+              <label class="block text-sm font-medium text-nord3 dark:text-nord4">
+                Theme file (.otz)
+              </label>
               <input
                 type="file"
                 name="theme_file"
                 accept=".otz"
                 required
-                class="block w-full text-sm text-nord3 dark:text-nord4 file:mr-4 file:rounded-md file:border-0 file:bg-nord8/20 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-nord10 hover:file:bg-nord8/30 bg-nord5/60 dark:bg-nord2/80 border border-nord4/60 dark:border-nord2 rounded-lg focus:outline-none focus:ring-2 focus:ring-nord8/70"
+                class="block w-full text-sm text-nord3 dark:text-nord4
+                       file:mr-4 file:rounded-md file:border-0 file:bg-nord8/20
+                       file:px-3 file:py-1.5 file:text-sm file:font-medium
+                       file:text-nord10 hover:file:bg-nord8/30
+                       bg-nord6 dark:bg-nord2
+                       border border-nord4 dark:border-nord2
+                       rounded-lg focus:outline-none focus:ring-2 focus:ring-nord8/70"
               />
             </div>
 
@@ -131,12 +153,16 @@
               </p>
               <button
                 type="submit"
-                class="inline-flex items-center gap-2 rounded-full bg-nord8 hover:bg-nord10 text-nord0 px-4 py-2 text-sm font-semibold shadow-sm shadow-nord0/20 transition-colors"
+                class="inline-flex items-center gap-2 rounded-full
+                       bg-nord8 hover:bg-nord10 text-nord0
+                       px-4 py-2 text-sm font-semibold
+                       shadow-sm shadow-nord0/20 transition-colors"
               >
-                <span>Upload &amp; convert</span>
+                Upload &amp; convert
               </button>
             </div>
           </form>
+
         </div>
       </div>
     </main>
