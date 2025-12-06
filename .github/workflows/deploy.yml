@@ -1,0 +1,41 @@
+name: Deploy to VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Connect & deploy via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.VM_PORT }}
+        script: |
+          cd ${{ secrets.VM_PATH }}
+
+          echo "👉 Pulling latest code"
+          git reset --hard
+          git pull origin main
+
+          echo "👉 Updating dependencies"
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt --quiet
+
+          echo "👉 Restarting services"
+          sudo systemctl restart openlp-web
+          sudo systemctl restart openlp-worker
+          sudo systemctl restart openlp-scheduler
+
+          echo "✨ Deployment completed!"
+
