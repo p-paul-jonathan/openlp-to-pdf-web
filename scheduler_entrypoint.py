@@ -1,26 +1,21 @@
-# Needed for deployment in GCP
+import time
+from jobs.housekeeper_job import HousekeeperJob
 
-import threading
-import os
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import subprocess
+INTERVAL_SECONDS = 600   # 10 minutes
+AGE_THRESHOLD = 60       # delete jobs older than 1 minute
 
-PORT = int(os.environ.get("PORT", 8080))
+def run_scheduler():
+    print("🧹 OpenLP Scheduler started")
+    print(f"⏱ Running every {INTERVAL_SECONDS} seconds")
+    print(f"🔥 Cleaning jobs older than {AGE_THRESHOLD} seconds")
 
-class Handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"scheduler alive")
+    while True:
+        try:
+            HousekeeperJob(max_age=AGE_THRESHOLD).run()
+        except Exception as e:
+            print(f"❌ Scheduler error: {e}")
 
-def start_http_server():
-    server = HTTPServer(("0.0.0.0", PORT), Handler)
-    server.serve_forever()
-
-def start_scheduler():
-    subprocess.Popen(["python", "scripts/scheduler.py"]).wait()
+        time.sleep(INTERVAL_SECONDS)
 
 if __name__ == "__main__":
-    threading.Thread(target=start_http_server).start()
-    start_scheduler()
-
+    run_scheduler()
