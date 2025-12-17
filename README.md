@@ -2,6 +2,8 @@
 
 Convert OpenLP service files (.osz) into beautifully themed PDF slides using OpenLP theme files (.otz) — all via a web interface.
 
+currently active on https://openlp-to-pdf.duckdns.org/
+
 ## Built with
 
 - Flask (web app)
