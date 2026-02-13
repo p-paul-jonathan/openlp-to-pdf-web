@@ -8,7 +8,7 @@ currently active on https://openlp-to-pdf.duckdns.org/
 
 - Flask (web app)
 - Redis + RQ (background jobs)
-- weasyprint (PDF rendering via Chromium)
+- weasyprint (PDF rendering)
 - Tailwind CSS + Nord theme (frontend)
 - Docker & Docker Compose (production-ready deployment)
 
