@@ -8,7 +8,7 @@ currently active on https://openlp-to-pdf.duckdns.org/
 
 - Flask (web app)
 - Redis + RQ (background jobs)
-- Playwright (PDF rendering via Chromium)
+- weasyprint (PDF rendering via Chromium)
 - Tailwind CSS + Nord theme (frontend)
 - Docker & Docker Compose (production-ready deployment)
 
@@ -247,7 +247,7 @@ PYTHONPATH=. python scripts/scheduler.py # housekeeper job
 
 ## ❤️ Credits
 - OpenLP community (format + themes)
-- Playwright (rock-solid PDF generation)
+- weasyprint (rock-solid PDF generation)
 - Redis + RQ (job queue)
 - Nord theme
 - Flask + Tailwind CSS
