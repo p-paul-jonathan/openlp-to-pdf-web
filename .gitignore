@@ -10,6 +10,9 @@ venv/
 .venv/
 env/
 
+# test
+test_data/
+
 # Flask
 instance/
 .webassets-cache
