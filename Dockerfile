@@ -22,6 +22,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxcb1 \
     libxkbcommon0 \
     libasound2 \
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
+    libpangocairo-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf-2.0-0 \
+    shared-mime-info \
     fonts-liberation \
     fonts-noto-core \
     fonts-noto-mono \
@@ -34,8 +40,6 @@ WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-RUN python -m playwright install chromium
 
 COPY . .
 
