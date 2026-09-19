@@ -2,6 +2,7 @@ import os
 import zipfile
 import json
 import uuid
+import shutil
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -121,11 +122,11 @@ def extract_openlp_items(job_dir, service_file_path, theme_file_path):
 # UPLOAD
 # -------------------------
 
-def upload_files_to_tmp(service_file, theme_file):
+def upload_files_to_tmp(service_file, theme_file=None, theme_file_path=None):
     if not service_file:
         raise ValueError("Service file missing")
 
-    if not theme_file:
+    if not theme_file and not theme_file_path:
         raise ValueError("Theme file missing")
 
     job_id = str(uuid.uuid4())
@@ -133,19 +134,34 @@ def upload_files_to_tmp(service_file, theme_file):
 
     os.makedirs(job_dir, exist_ok=True)
 
-    service_file_path = os.path.join(job_dir, service_file.filename)
-    theme_file_path = os.path.join(job_dir, theme_file.filename)
+    service_filename = os.path.basename(service_file.filename)
+    service_path = os.path.join(job_dir, service_filename)
+
+    if theme_file:
+        theme_filename = os.path.basename(theme_file.filename)
+        theme_path = os.path.join(job_dir, theme_filename)
+    else:
+        assert theme_file_path is not None
+
+        theme_filename = os.path.basename(theme_file_path)
+        theme_path = os.path.join(job_dir, theme_filename)
 
     try:
-        service_file.save(service_file_path)
-        theme_file.save(theme_file_path)
-    except Exception as e:
-        raise IOError(f"Failed to save uploaded files: {e}")
+        service_file.save(service_path)
 
-    if not os.path.exists(service_file_path):
+        if theme_file:
+            theme_file.save(theme_path)
+        else:
+            assert theme_file_path is not None
+            shutil.copy2(theme_file_path, theme_path)
+
+    except Exception as e:
+        raise IOError(f"Failed to save files: {e}")
+
+    if not os.path.exists(service_path):
         raise IOError("Service file did not save correctly")
 
-    if not os.path.exists(theme_file_path):
+    if not os.path.exists(theme_path):
         raise IOError("Theme file did not save correctly")
 
-    return job_id, service_file_path, theme_file_path
+    return job_id, service_path, theme_path
